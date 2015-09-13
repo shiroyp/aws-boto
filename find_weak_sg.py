@@ -6,11 +6,9 @@ A Sample python program to navigate through your aws security groups in every re
 import boto3
 
 client = boto3.client('ec2', region_name='us-east-1')
-
 desc_regions = client.describe_regions()
 
 for region in desc_regions['Regions']:
-    print (region['RegionName'])
     weak_sgs=[]
     new_client=boto3.client('ec2',region_name=region['RegionName'])
     desc_sg = new_client.describe_security_groups()
@@ -24,7 +22,8 @@ for region in desc_regions['Regions']:
                     # print(IpPerms)
                     for IpRanges in IpPerms['IpRanges']:
                         if (IpRanges['CidrIp'] == '0.0.0.0/0'):
-                            weak_sgs.append(sg['GroupId'])
-    print (list(set(weak_sgs)))
-    print('')
-
+                            weak_sgs.append(sg['GroupId'] + ' (' + sg['GroupName'] + ')')
+    if (len(weak_sgs) > 0):
+        print (region['RegionName'])
+        print (list(set(weak_sgs)))
+        print('')
