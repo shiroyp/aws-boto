@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
 # I use this script to update my security group sg-9df995f8 with my current public IP. 
 # It removes all the access rules from the security group which are not matching with Public IP.
+
 __author__ = 'Shiroy'
 
 from boto3.session import Session
 from urllib.request import urlopen
-
+from re import findall
 # Customize the following section based on your setup
 my_region='eu-west-1'
 my_security_group='sg-9df995f8'
 allowed_ports=(22,3389,8020,50010,50075,50475,50020,50070,50470,50090,8040,8042,8032,8033,8031,8030,8088,10000,18080)
 
-#Find out the current public IP
-request = urlopen('http://checkip.amazonaws.com')
+
+request = urlopen('http://www.whatismypublicip.com/')
 data = request.read()
-my_ip=data.rstrip('\n') + '/' + '32'
+ip_data = findall(b"\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}", data)
+ip = str(ip_data[0]).split("'")[1]
+my_ip=ip+'/'+'32'
 print('Current Public IP : ' + my_ip)
+
 
 # Open new EC2 session
 session = Session()
